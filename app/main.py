@@ -57,8 +57,5 @@ def main():
                 with open(args["file_path"], "r") as f:
                     print(f.read())
 
-    print(chat.choices[0].message.content)
-
-
 if __name__ == "__main__":
     main()
