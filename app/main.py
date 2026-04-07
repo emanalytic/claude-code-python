@@ -20,7 +20,8 @@ class ExecuteTool:
 
     def write(self):
         with open(self.args["file_path"], "w") as f:
-            return f.write(self.args["content"])
+            f.write(self.args["content"])
+            return self.args["content"]
 
 
 def main():
@@ -39,6 +40,27 @@ def main():
             model="anthropic/claude-haiku-4.5",
             messages=messages,
             tools=[
+        {
+            "type": "function",
+            "function": {
+
+                "name": "Write",
+                "description": "Write and return the contents of a file",
+                "parameters": {
+                    "type": "object",
+            "properties": {
+                "file_path": {
+                "type": "string",
+                "description": "The path to the file to write"
+                },
+                "content": {
+                "type": "string",
+                "description": "The content to write to the file"
+                }
+            },
+            "required": ["file_path", "content"]
+            }
+        },
         {
             "type": "function",
             "function": {
