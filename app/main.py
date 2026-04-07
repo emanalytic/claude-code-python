@@ -81,8 +81,7 @@ def main():
             if result.func == "Read":
                 file_content = result.read()
             elif result.func == "Write":
-                result.write()
-                file_content = "File written successfully"
+                file_content = result.write()
             else:
                 file_content = "Unknown function"
             messages.append(
