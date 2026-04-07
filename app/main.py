@@ -18,6 +18,10 @@ class ExecuteTool:
         with open(self.args["file_path"], "r") as f:
             return f.read()
 
+    def write(self):
+        with open(self.args["file_path"], "w") as f:
+            f.write(self.args["content"])
+
 
 def main():
     p = argparse.ArgumentParser()
@@ -76,7 +80,12 @@ def main():
             result = ExecuteTool(tc)
             if result.func == "Read":
                 file_content = result.read()
-                messages.append(
+            elif result.func == "Write":
+                result.write()
+                file_content = "File written successfully"
+            else:
+                file_content = "Unknown function"
+            messages.append(
                     {
                         "role": "tool",
                         "tool_call_id": tc.id,
