@@ -20,7 +20,7 @@ class ExecuteTool:
 
     def write(self):
         with open(self.args["file_path"], "w") as f:
-            f.write(self.args["content"])
+            return f.write(self.args["content"])
 
 
 def main():
