@@ -23,6 +23,9 @@ class ExecuteTool:
             f.write(self.args["content"])
             return self.args["content"]
 
+    def bash(self):
+        return os.popen(self.args["command"]).read()
+
 
 def main():
     p = argparse.ArgumentParser()
@@ -78,6 +81,23 @@ def main():
                         },
                     },
                 },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "Bash",
+                        "description": "Execute a bash command",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "command": {
+                                    "type": "string",
+                                    "description": "The bash command to execute",
+                                }
+                            },
+                            "required": ["command"],
+                        },
+                    },
+                },
             ],
         )
         response = chat.choices[0].message
@@ -104,6 +124,8 @@ def main():
                 file_content = result.read()
             elif result.func == "Write":
                 file_content = result.write()
+            elif result.func == "Bash":
+                file_content = result.bash()
             else:
                 file_content = "Unknown function"
             messages.append(
