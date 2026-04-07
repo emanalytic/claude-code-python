@@ -27,8 +27,9 @@ def main():
         raise RuntimeError("OPENROUTER_API_KEY is not set")
 
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
+
+    messages = [{"role": "user", "content": args.p}]
     while True:
-        messages = [{"role": "user", "content": args.p}]
         chat = client.chat.completions.create(
             model="anthropic/claude-haiku-4.5",
             messages=messages,
@@ -55,20 +56,35 @@ def main():
         response = chat.choices[0].message
         if not chat.choices or len(chat.choices) == 0:
             raise RuntimeError("no choices in response")
-        if not response.tool_calls:
+        response_message = chat.choices[0].message
+        message_dict = {"role": "assistant", "content": response.content}
+        if hasattr(response, "tool_calls") and response.tool_calls:
+            message_dict["tool_calls"] = [
+                {
+                    "id": tc.id,
+                    "type": tc.type,
+                    "function": {
+                        "name": tc.function.name,
+                        "arguments": tc.function.arguments,
+                    },
+                }
+                for tc in response_message.tool_calls
+            ]
+        messages.append(message_dict)
+        if not message_dict.get("tool_calls"):
             print(response.content)
             break
-
-        tool_calls = response.tool_calls
-        for tool_call in tool_calls:
-            result = ExecuteTool(tool_call)
+        for tc in response.tool_calls:
+            result = ExecuteTool(tc)
             if result.func == "Read":
                 result.read()
-                messages.append({"role": "assistant", "content": response.content})
-            else:
-                raise RuntimeError("unknown function")
-        else:
-            print(chat.choices[0].message.content)
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc.id,
+                        "content": result,
+                    }
+                )
 
 
 
