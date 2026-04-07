@@ -40,46 +40,46 @@ def main():
             model="anthropic/claude-haiku-4.5",
             messages=messages,
             tools=[
-        {
-            "type": "function",
-            "function": {
-
-                "name": "Write",
-                "description": "Write and return the contents of a file",
-                "parameters": {
-                    "type": "object",
-            "properties": {
-                "file_path": {
-                "type": "string",
-                "description": "The path to the file to write"
+                 {
+                    "type": "function",
+                    "function": {
+                        "name": "Write",
+                        "description": "Write and return the contents of a file",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "file_path": {
+                                    "type": "string",
+                                    "description": "The path to the file to write",
+                                },
+                                "content": {
+                                    "type": "string",
+                                    "description": "The content to write to the file",
+                                },
+                            },
+                            "required": ["file_path", "content"],
+                        },
+                    },
                 },
-                "content": {
-                "type": "string",
-                "description": "The content to write to the file"
-                }
-            },
-            "required": ["file_path", "content"]
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "Read",
-                "description": "Read and return the contents of a file",
-                "parameters": {
-                    "type": "object",
-            "properties": {
-                "file_path": {
-                "type": "string",
-                "description": "The path to the file to read"
-                }
-            },
-            "required": ["file_path"]
-            }
-        }
-        }
-    ]
-    )
+       {
+                    "type": "function",
+                    "function": {
+                        "name": "Read",
+                        "description": "Read and return the contents of a file",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "file_path": {
+                                    "type": "string",
+                                    "description": "The path to the file to read",
+                                }
+                            },
+                            "required": ["file_path"],
+                        },
+                    },
+                },
+            ],
+        )
         response = chat.choices[0].message
         message_dict = {"role": "assistant", "content": response.content}
         if hasattr(response, "tool_calls") and response.tool_calls:
