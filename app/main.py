@@ -27,11 +27,12 @@ def main():
         raise RuntimeError("OPENROUTER_API_KEY is not set")
 
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
-    messages = [{"role": "user", "content": args.p}]
-    chat = client.chat.completions.create(
-        model="anthropic/claude-haiku-4.5",
-        messages=messages,
-        tools=[
+    while True:
+        messages = [{"role": "user", "content": args.p}]
+        chat = client.chat.completions.create(
+            model="anthropic/claude-haiku-4.5",
+            messages=messages,
+            tools=[
         {
             "type": "function",
             "function": {
@@ -51,12 +52,9 @@ def main():
         }
     ]
     )
-    while True:
         response = chat.choices[0].message
         if not chat.choices or len(chat.choices) == 0:
             raise RuntimeError("no choices in response")
-
-        print("Logs from your program will appear here!", file=sys.stderr)
         if not response.tool_calls:
             print(response.content)
             break
@@ -71,6 +69,8 @@ def main():
                 raise RuntimeError("unknown function")
         else:
             print(chat.choices[0].message.content)
+
+
 
 if __name__ == "__main__":
     main()
