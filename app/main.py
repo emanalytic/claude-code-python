@@ -16,7 +16,8 @@ class ExecuteTool:
         self.args = json.loads(tool_call.function.arguments)
     def read(self):
         with open(self.args["file_path"], "r") as f:
-            print(f.read())
+            return f.read()
+
 
 def main():
     p = argparse.ArgumentParser()
@@ -54,9 +55,6 @@ def main():
     ]
     )
         response = chat.choices[0].message
-        if not chat.choices or len(chat.choices) == 0:
-            raise RuntimeError("no choices in response")
-        response_message = chat.choices[0].message
         message_dict = {"role": "assistant", "content": response.content}
         if hasattr(response, "tool_calls") and response.tool_calls:
             message_dict["tool_calls"] = [
@@ -68,7 +66,7 @@ def main():
                         "arguments": tc.function.arguments,
                     },
                 }
-                for tc in response_message.tool_calls
+                for tc in response.tool_calls
             ]
         messages.append(message_dict)
         if not message_dict.get("tool_calls"):
@@ -77,12 +75,12 @@ def main():
         for tc in response.tool_calls:
             result = ExecuteTool(tc)
             if result.func == "Read":
-                result.read()
+                file_content = result.read()
                 messages.append(
                     {
                         "role": "tool",
                         "tool_call_id": tc.id,
-                        "content": result,
+                        "content": file_content,
                     }
                 )
 
